@@ -34,10 +34,20 @@ class ParserTest < MiniTest::Test
   def test_uris
     gmi = parse_markers(File.read("data/test_uris.gmi", encoding: "UTF-8"))
     uris = [
-      {type: :uri, link: "gemini://gemini.circumlunar.space/docs/cheatsheet.gmi", text: nil},
-      {type: :uri, link: "gemini://gemini.circumlunar.space/docs/cheatsheet.gmi", text: "Cheat sheet"},
+      {:type=>:uri, :link=>"gemini://gemini.circumlunar.space/docs/cheatsheet.gmi", :text=>nil, :scheme=>"gemini"},
+      {:type=>:uri, :link=>"gemini://gemini.circumlunar.space/docs/cheatsheet.gmi", :text=>"Cheat sheet", :scheme=>"gemini"},
+      {:type=>:uri, :link=>"https://thebird.nl/", :text=>nil, :scheme=>"https"},
+      {:type=>:uri, :link=>"https://thebird.nl/blog/work/group.html#orgb77c658", :text=>nil, :scheme=>"https"},
+      {:type=>:uri, :link=>"file://no-exist.png", :text=>nil, :scheme=>"file"},
+      {:type=>:uri, :link=>"no-exist.png", :text=>nil, :scheme=>nil},
+      {:type=>:uri, :link=>"no-exist.png", :text=>"Image does not exist", :scheme=>nil},
+      {:type=>:uri, :link=>"does-exist.png", :text=>nil, :scheme=>"local"},
+      {:type=>:uri, :link=>"does-exist.png", :text=>"Image does exist", :scheme=>"local"},
+      {:type=>:uri, :link=>"./no-exist.png", :text=>nil, :scheme=>nil},
+      {:type=>:uri, :link=>"./no-exist.png", :text=>"Image does not exist", :scheme=>nil},
+      {:type=>:uri, :link=>"./does-exist.png", :text=>nil, :scheme=>"local"},
+      {:type=>:uri, :link=>"./does-exist.png", :text=>"Image does exist", :scheme=>"local"}
     ]
-    pp gmi
     gmi.each_with_index do | gemini,i |
       assert_equal(uris[i], uri_info(gemini), gmi[i])
     end
