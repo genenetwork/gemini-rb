@@ -15,8 +15,10 @@ echo "ln -s \$GUIX_ENVIRONMENT/bin/env /usr/bin/env"
 echo "ruby app.rb -s Puma"
 echo "  or"
 echo "puma -t 1 -e development"
+echo "  with rerun (so you don't have to reload)"
+echo "rerun -d .. 'ruby app.rb'"
 
 rm Gemfile.lock
-guix environment -C guix --ad-hoc ruby@2.6.5 nss-certs openssl --network ruby-sinatra ruby-puma less vim 
+guix environment -C guix --ad-hoc ruby@2.6.5 nss-certs openssl --network ruby-sinatra ruby-puma less vim ruby-rerun which
 
 # Start puma (see README)

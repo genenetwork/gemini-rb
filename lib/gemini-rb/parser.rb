@@ -18,6 +18,8 @@ module Gemini
 
   module Parser
 
+    extend self
+
     # Very simple block splitter. Makes sure text and verbatim blocks are together and
     # other lines are typed. That is all it should do! Resulting in
     # [{:type=>:header, :content=>"# Gemtext cheatsheet"},
@@ -90,7 +92,9 @@ module Gemini
     # now is a simple map
     def strip_markers(gmi)
       gmi.map { | h |
-        h in { type: type, content: content }
+        # h in { type: type, content: content }
+        type = h[:type]
+        content = h[:content]
         case type
         when :header
           m = /^(#+)(\s*)(.*)/.match(content)
