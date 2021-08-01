@@ -2,7 +2,8 @@
 => gemini://gemini.circumlunar.space/docs/cheatsheet.gmi Cheat sheet
 => https://thebird.nl/
 => https://thebird.nl/blog/work/group.html#orgb77c658
-=> file://no-exist.png
+=> file:///no-exist.png
+=> file://localhost/etc/no-exist.png
 => no-exist.png
 => no-exist.png Image does not exist
 => does-exist.png

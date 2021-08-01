@@ -38,7 +38,8 @@ class ParserTest < MiniTest::Test
       {:type=>:uri, :link=>"gemini://gemini.circumlunar.space/docs/cheatsheet.gmi", :text=>"Cheat sheet", :scheme=>"gemini"},
       {:type=>:uri, :link=>"https://thebird.nl/", :text=>nil, :scheme=>"https"},
       {:type=>:uri, :link=>"https://thebird.nl/blog/work/group.html#orgb77c658", :text=>nil, :scheme=>"https"},
-      {:type=>:uri, :link=>"file://no-exist.png", :text=>nil, :scheme=>"file"},
+      {:type=>:uri, :link=>"file:///no-exist.png", :text=>nil, :scheme=>"file"},
+      {:type=>:uri, :link=>"file://localhost/etc/no-exist.png", :text=>nil, :scheme=>"file"},
       {:type=>:uri, :link=>"no-exist.png", :text=>nil, :scheme=>nil},
       {:type=>:uri, :link=>"no-exist.png", :text=>"Image does not exist", :scheme=>nil},
       {:type=>:uri, :link=>"does-exist.png", :text=>nil, :scheme=>"local"},
@@ -48,8 +49,10 @@ class ParserTest < MiniTest::Test
       {:type=>:uri, :link=>"./does-exist.png", :text=>nil, :scheme=>"local"},
       {:type=>:uri, :link=>"./does-exist.png", :text=>"Image does exist", :scheme=>"local"}
     ]
-    gmi.each_with_index do | gemini,i |
-      assert_equal(uris[i], uri_info(gemini), gmi[i])
+    Dir.chdir("data/") do
+      gmi.each_with_index do | gemini,i |
+        assert_equal(uris[i], uri_info(gemini), gmi[i])
+      end
     end
   end
 
