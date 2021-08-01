@@ -22,8 +22,9 @@ class ParserTest < MiniTest::Test
 
   def test_strip_markers
     # First transform sets header levels, splits URI text, and cleans up markers in content
-    gmi = strip_markers(parse_blocks(File.read("data/test01.gmi", encoding: "UTF-8")))
+    gmi = parse_markers(File.read("data/test01.gmi", encoding: "UTF-8"))
     assert_equal({type: :header, level: 1, content: "Gemtext cheatsheet"}, gmi[0])
+    assert_equal({type: :header, level: 2, content: "Headings"}, gmi[6])
     assert_equal({type: :text, content: ["Here's the basics of how text works in Gemtext:"]}, gmi[1])
     assert_equal({type: :list, :content=>"Long lines get wrapped by the client to fit the screen"}, gmi[2])
     assert_equal({type: :verbatim, content: ["* Mercury", "* Gemini", "* Apollo"]}, gmi[10])
@@ -31,7 +32,7 @@ class ParserTest < MiniTest::Test
   end
 
   def test_uris
-    gmi = strip_markers(parse_blocks(File.read("data/test_uris.gmi", encoding: "UTF-8")))
+    gmi = parse_markers(File.read("data/test_uris.gmi", encoding: "UTF-8"))
     uris = [
       {type: :uri, link: "gemini://gemini.circumlunar.space/docs/cheatsheet.gmi", text: nil},
       {type: :uri, link: "gemini://gemini.circumlunar.space/docs/cheatsheet.gmi", text: "Cheat sheet"},

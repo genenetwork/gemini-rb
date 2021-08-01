@@ -79,12 +79,23 @@ module Gemini
       list
     end
 
+    # Slightly more high level parser compared to parse_blocks.
+    def parse_markers(buf)
+      strip_markers(parse_blocks(buf))
+    end
+
+    # ---- Below methods work on GMI type
+
+    # Helper for stripping markers. Note that because of the blocks it
+    # now is a simple map
     def strip_markers(gmi)
       gmi.map { | h |
         h in { type: type, content: content }
         case type
         when :header
-          { type: type, level: 1, content: content.sub(/^#+\s*/,"") }
+          m = /^(#+)(\s*)(.*)/.match(content)
+          level = m[1].count("#")
+          { type: type, level: level, content: m[3] }
         when :list
           { type: type, content: content.sub(/^\*\s*/,"") }
         when :uri
@@ -97,6 +108,7 @@ module Gemini
         end
       }
     end
+
 
   end
 
