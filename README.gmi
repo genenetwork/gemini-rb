@@ -1,0 +1,15 @@
+# GEMINI-RB
+
+Ruby parser and HTML viewer for the Gemini gemtext format.
+
+The parser simply converts gemtext into blocks and can be used standalone for generating output.
+
+The HTML viewer will embed images for viewing and add source code syntax highlighting. It also makes use of some annotations in the file to generate a web-based version of our issue tracker.
+
+## License
+
+Code is under the liberal BSD license.
+
+## Copyright
+
+Pjotr Prins (C) 2021
