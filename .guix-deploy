@@ -1,0 +1,22 @@
+# Set up GNU Guix environment to run tooling
+#
+# set PATHs with something like 
+#
+#   export PATH=~/opt/guix/bin:$PATH
+#   export GUIX_PACKAGE_PATH=$HOME/guix-update-channel
+# 
+# before running below. 
+#
+
+echo "# When in the container type:"
+echo "mkdir /usr/bin -p"
+echo "ln -s \$GUIX_ENVIRONMENT/bin/env /usr/bin/env"
+# echo "env PATH=/bhxiv-gen-pdf/bin:\$PATH puma -t 1 -e development"
+echo "ruby app.rb -s Puma"
+echo "  or"
+echo "puma -t 1 -e development"
+
+rm Gemfile.lock
+guix environment -C guix --ad-hoc ruby@2.6.5 nss-certs openssl --network ruby-sinatra ruby-puma less vim 
+
+# Start puma (see README)

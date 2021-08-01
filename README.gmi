@@ -4,11 +4,40 @@ Ruby parser and HTML viewer for the Gemini gemtext format.
 
 The parser simply converts gemtext into blocks and can be used standalone for generating output.
 
-The HTML viewer will embed images for viewing and add source code syntax highlighting. It also makes use of some annotations in the file to generate a web-based version of our issue tracker.
+The Sinatra based HTML viewer will embed images for viewing and add source code syntax highlighting. It also makes use of some annotations in the file to generate a web-based version of our issue tracker.
+
+## Run webserver
+
+We run Sinatra with Puma or standalone
+
+=> .guix-deploy Puma/sinatra setup
+
+Set up a Guix container (after installing GNU Guix)
+
+```
+source .guix-deploy
+cd web
+```
+
+Run Sinatra
+
+```
+ruby app.rb -s Puma
+```
+
+or
+
+```
+puma -t 1 -e development
+```
+
+For production simply run puma.
 
 ## License
 
 Code is under the liberal BSD license.
+
+=> LICENSE
 
 ## Copyright
 
