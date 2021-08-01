@@ -77,4 +77,7 @@ module Gemini
     list
   end
 
+  def transform1(gmi)
+    gmi
+  end
 end
