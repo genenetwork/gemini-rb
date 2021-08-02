@@ -22,6 +22,7 @@ module Gemini
 
     # Very simple block splitter. Makes sure text and verbatim blocks are together and
     # other lines are typed. That is all it should do! Resulting in
+    # FIXME: all content is an array now:
     # [{:type=>:header, :content=>"# Gemtext cheatsheet"},
     #  {:type=>:text, :content=>["Here's the basics of how text works in Gemtext:"]},
     #   {:type=>:list, :content=>"* Long lines get wrapped by the client to fit the screen"},
@@ -38,44 +39,48 @@ module Gemini
       list = []
       h = {}
       inblock = false
+      inverbatim = false
       lines.each do |line|
         l = line.strip
-        # First decide if we have a new type
-        if inblock
-          if h[:type] == :verbatim
-            if l =~ /^```/
-              inblock = false
-            else
-              h[:content].push l
-            end
-          else # type == :text
-            if l == ""
-              inblock = false
-            else
-              h[:content].push l
-            end
+        type = h[:type]
+        content = h[:content]
+        if inverbatim
+          if l =~ /^```/ # verbatim can contain empty lines, so it is different
+            list.push(h)
+            inblock = false
+            inverbatim = false
+          else
+            h[:content].push l
+          end
+        elsif inblock
+          if l == ""
+            list.push(h)
+            inblock = false
+          else
+            h[:content].push l
           end
         else
           if l == ""
             next
           elsif l =~ /^#/
-            h = { type: :header, content: l }
+            h = { type: :header, content: [l] }
           elsif l =~ /^\*/
-            h = { type: :list, content: l }
+            h = { type: :list, content: [l] }
+            inblock = true
           elsif l =~ /^\>/
-            h = { type: :quote, content: l }
+            h = { type: :quote, content: [l] }
+            inblock = true
           elsif l =~ /^\=>/
-            h = { type: :uri, content: l }
+            h = { type: :uri, content: [l] }
           elsif l =~ /^```/
             h = { type: :verbatim, content: [] }
+            inverbatim = true
             inblock = true
           else
-            h = { type: :text, content: [ l ] }
+            h = { type: :text, content: [l] }
             inblock = true
           end
-        end
-        if !inblock
-          list.push(h)
+          list.push(h) if !inblock # push the singletons
         end
       end
       list
@@ -95,15 +100,16 @@ module Gemini
         # h in { type: type, content: content }
         type = h[:type]
         content = h[:content]
+        text = content[0]
         case type
         when :header
-          m = /^(#+)(\s*)(.*)/.match(content)
+          m = /^(#+)(\s*)(.*)/.match(text)
           level = m[1].count("#")
-          { type: type, level: level, content: m[3] }
+          { type: type, level: level, content: [m[3]] }
         when :list
-          { type: type, content: content.sub(/^\*\s*/,"") }
+          { type: type, content: text.sub(/^\*\s*/,"") }
         when :uri
-          a = content.sub(/^=>\s*/,"").split(" ",2)
+          a = text.sub(/^=>\s*/,"").split(" ",2)
           link = a[0]
           text = a[1]
           { type: type, link: link, text: text }

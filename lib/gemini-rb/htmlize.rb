@@ -2,8 +2,6 @@ require 'gemini-rb/parser'
 require 'gemini-rb/helpers'
 
 module Gemini
-  # include Parser
-  # include Helpers
 
   module HTML
 
