@@ -38,11 +38,12 @@ module Gemini
     #  :content=>["# Heading", "", "## Sub-heading", "", "### Sub-subheading"]},
     # ... ]
     #
-    # Note that I am taking some liberties here. Most importantly: blank lines are
-    # ignored. Also the regexes assume the input is correct.
+    # Note that I am taking some liberties here. Most importantly:
+    # blank lines are counted as one and ignored by default. Also, in
+    # general, the regexes assume the input is correct.
     #
     # Futher transformations should happen in other methods
-    def parse_blocks(buf)
+    def parse_blocks(buf, include_blank_lines = false)
       # The idea is simple: collect lines and store in 'content'
       # buffer. when the type :header, :list, :quote, :uri, :verbatim,
       # :text changes push content on the 'stack'.
@@ -68,8 +69,17 @@ module Gemini
         end
       end
 
-      lines = buf.split("\n")
       list = []
+
+      push = lambda { |h, type|
+        if include_blank_lines
+          list.push(h) if h != {} and type != nil
+        else
+          list.push(h) if h != {} and type != nil and type != :blank # push on the stack
+        end
+      }
+
+      lines = buf.split("\n")
       h = {}
       in_block = nil
       lines.each do |line|
@@ -89,7 +99,7 @@ module Gemini
           # do not put URIs in one content block
           in_block = nil
           list.push(h)
-          type = :blank # make sure we load the next URI
+          type = nil # make sure we load the next URI
         elsif in_block # all other blocks
           if newtype != type
             in_block = nil # next block
@@ -101,7 +111,7 @@ module Gemini
         # ---- If the type changes push the last one on the stack and
         #      initialize a new one
         if type != newtype
-          list.push(h) if h != {} and type != :blank # push on the stack
+          push.call(h,type)
           in_block = newtype
           if newtype == :verbatim
             h = { type: newtype, content: [] }
@@ -110,13 +120,13 @@ module Gemini
           end
         end
       end
-      list.push(h) if h[:type] != :blank # final push
+      push.call(h,h[:type]) # final push
       list
     end
 
     # Slightly more high level parser compared to parse_blocks.
-    def parse_markers(buf)
-      strip_markers(parse_blocks(buf))
+    def parse_markers(buf, include_blank_lines = false)
+      strip_markers(parse_blocks(buf,include_blank_lines))
     end
 
     # ---- Below methods work on GMI type
