@@ -21,7 +21,9 @@ module Gemini
     extend self
 
     # Very simple block splitter. Makes sure text and verbatim blocks are together and
-    # other lines are typed. That is all it should do! Resulting in
+    # other lines are typed. That is all it should do!
+    #
+    # Resulting in
     # [{:type=>:header, :content=>["# Gemtext cheatsheet"]},
     # {:type=>:text, :content=>["Here's the basics of how text works in Gemtext:"]},
     # {:type=>:list,
@@ -36,56 +38,79 @@ module Gemini
     #  :content=>["# Heading", "", "## Sub-heading", "", "### Sub-subheading"]},
     # ... ]
     #
+    # Note that I am taking some liberties here. Most importantly: blank lines are
+    # ignored. Also the regexes assume the input is correct.
+    #
     # Futher transformations should happen in other methods
     def parse_blocks(buf)
+      # The idea is simple: collect lines and store in 'content'
+      # buffer. when the type :header, :list, :quote, :uri, :verbatim,
+      # :text changes push content on the 'stack'.
+
+      def get_type(l)
+        # Gemini, usefully, allows you to recognise a type at the
+        # start of a string
+        case l
+        when ""
+          :blank
+        when /^#/
+          :header
+        when /^\*/
+          :list
+        when /^\>/
+          :quote
+        when /^\=>/
+          :uri
+        when /^```/
+          :verbatim
+        else
+          :text
+        end
+      end
+
       lines = buf.split("\n")
       list = []
       h = {}
-      inblock = false
-      inverbatim = false
+      in_block = nil
       lines.each do |line|
-        l = line.strip
-        type = h[:type]
-        content = h[:content]
-        if inverbatim
-          if l =~ /^```/ # verbatim can contain empty lines, so it is different
-            list.push(h)
-            inblock = false
-            inverbatim = false
+        l = line # should not .strip
+        newtype = get_type(l) # the type of the new line
+        type = h[:type] # the running type
+        # pp h
+        # p [:in_block,in_block,:newtype,newtype]
+        if in_block == :verbatim # verbatim can contain empty lines, so it is treated different
+          if newtype == :verbatim # found end of verbatim section
+            in_block = nil # next block
           else
-            h[:content].push l
-          end
-        elsif inblock
-          if l == ""
-            list.push(h)
-            inblock = false
-          else
-            h[:content].push l
-          end
-        else
-          if l == ""
+            h[:content].push l # add content and move on
             next
-          elsif l =~ /^#/
-            h = { type: :header, content: [l] }
-          elsif l =~ /^\*/
-            h = { type: :list, content: [l] }
-            inblock = true
-          elsif l =~ /^\>/
-            h = { type: :quote, content: [l] }
-            inblock = true
-          elsif l =~ /^\=>/
-            h = { type: :uri, content: [l] }
-          elsif l =~ /^```/
-            h = { type: :verbatim, content: [] }
-            inverbatim = true
-            inblock = true
-          else
-            h = { type: :text, content: [l] }
-            inblock = true
           end
-          list.push(h) if !inblock # push the singletons
+        elsif type == :uri and newtype == :uri
+          # do not put URIs in one content block
+          in_block = nil
+          list.push(h)
+          type = :blank # make sure we load the next URI
+        elsif in_block # all other blocks
+          if newtype != type
+            in_block = nil # next block
+          else
+            h[:content].push l # add content and move on
+            next
+          end
+        end
+        # ---- If the type changes push the last one on the stack and
+        #      initialize a new one
+        if type != newtype
+          list.push(h) if h != {} and type != :blank # push on the stack
+          in_block = newtype
+          if newtype == :verbatim
+            h = { type: newtype, content: [] }
+          else
+            h = { type: newtype, content: [l] }
+          end
         end
       end
+      list.push(h) if h[:type] != :blank # final push
       list
     end
 
