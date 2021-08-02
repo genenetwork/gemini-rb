@@ -22,16 +22,19 @@ module Gemini
 
     # Very simple block splitter. Makes sure text and verbatim blocks are together and
     # other lines are typed. That is all it should do! Resulting in
-    # FIXME: all content is an array now:
-    # [{:type=>:header, :content=>"# Gemtext cheatsheet"},
-    #  {:type=>:text, :content=>["Here's the basics of how text works in Gemtext:"]},
-    #   {:type=>:list, :content=>"* Long lines get wrapped by the client to fit the screen"},
-    #   {:type=>:list, :content=>"* Short lines *don't* get joined together"},
-    #   {:type=>:list, :content=>"* Write paragraphs as single long lines"},
-    #   {:type=>:list, :content=>"* Blank lines are rendered verbatim"},
-    # {:type=>:header, :content=>"## Headings"},
-    #  {:type=>:text, :content=>["You get three levels of heading:"]},
-    #  {:type=>:verbatim, :content=>["# Heading", "", "## Sub-heading", "", "### Sub-subheading"]}, ... ]
+    # [{:type=>:header, :content=>["# Gemtext cheatsheet"]},
+    # {:type=>:text, :content=>["Here's the basics of how text works in Gemtext:"]},
+    # {:type=>:list,
+    # :content=>
+    # ["* Long lines get wrapped by the client to fit the screen",
+    #  "* Short lines *don't* get joined together",
+    #  "* Write paragraphs as single long lines",
+    #  "* Blank lines are rendered verbatim"]},
+    # {:type=>:header, :content=>["## Headings"]},
+    # {:type=>:text, :content=>["You get three levels of heading:"]},
+    # {:type=>:verbatim,
+    #  :content=>["# Heading", "", "## Sub-heading", "", "### Sub-subheading"]},
+    # ... ]
     #
     # Futher transformations should happen in other methods
     def parse_blocks(buf)
@@ -97,7 +100,7 @@ module Gemini
     # now is a simple map
     def strip_markers(gmi)
       gmi.map { | h |
-        # h in { type: type, content: content }
+        # h in { type: type, content: content } # Ruby 3 only
         type = h[:type]
         content = h[:content]
         text = content[0]
@@ -107,7 +110,9 @@ module Gemini
           level = m[1].count("#")
           { type: type, level: level, content: [m[3]] }
         when :list
-          { type: type, content: text.sub(/^\*\s*/,"") }
+          { type: type, content: content.map { |t| t.sub(/^\*\s*/,"") }}
+        when :quote
+          { type: type, content: content.map { |t| t.sub(/^\>\s?/,"") }}
         when :uri
           a = text.sub(/^=>\s*/,"").split(" ",2)
           link = a[0]
