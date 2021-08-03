@@ -13,7 +13,7 @@ class ParserTest < MiniTest::Test
   def test_parse_blocks01
     # Simple block parser with no content transformations
     gmi = parse_blocks(File.read("data/test01.gmi", encoding: "UTF-8"))
-    # pp gmi
+    pp gmi
     assert_equal(15,gmi.size)
     assert_equal({type: :header, content: ["# Gemtext cheatsheet"]}, gmi[0])
     assert_equal({:type=>:text, :content=>["Here's the basics of how text works in Gemtext:"]}, gmi[1])

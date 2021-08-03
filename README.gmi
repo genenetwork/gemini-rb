@@ -6,9 +6,50 @@ The parser simply converts gemtext into blocks and can be used standalone for ge
 
 The Sinatra based HTML viewer will embed images for viewing and add source code syntax highlighting. It also makes use of some annotations in the file to generate a web-based version of our issue tracker.
 
+## Parse gemtext into blocks
+
+=> ./test/data/test01.gmi Example
+
+will parse into
+
+```
+[{:type=>:header, :content=>["# Gemtext cheatsheet"]},
+ {:type=>:text, :content=>["Here's the basics of how text works in Gemtext:"]},
+ {:type=>:list,
+  :content=>
+   ["* Long lines get wrapped by the client to fit the screen",
+    "* Short lines *don't* get joined together",
+    "* Write paragraphs as single long lines",
+    "* Blank lines are rendered verbatim"]},
+ {:type=>:header, :content=>["## Headings"]},
+ {:type=>:text, :content=>["You get three levels of heading:"]},
+ {:type=>:verbatim,
+  :content=>["# Heading", "", "## Sub-heading", "", "### Sub-subheading"]},
+ {:type=>:text,
+  :content=>["You get one kind of list and you can't nest them:"]},
+ {:type=>:verbatim, :content=>["* Mercury", "* Gemini", "* Apollo"]},
+ {:type=>:text, :content=>["Here's a quote from Maciej Cegłowski:"]},
+ {:type=>:quote,
+  :content=>
+   ["> I contend that text-based websites should not exceed in size the major works of Russian literature."]},
+ {:type=>:text, :content=>["A multiline quote:"]},
+ {:type=>:quote, :content=>["> Line 1", "> Line 2"]},
+ {:type=>:text,
+  :content=>
+   ["Lines which start with ``` will cause clients to toggle in and out of ordinary rendering mode and preformatted mode. In preformatted mode, Gemtext syntax is ignored so links etc. will not be rendered, and text will appear in a monospace font."]},
+ {:type=>:text, :content=>["Proxied content from"]},
+ {:type=>:uri,
+  :content=>["=> gemini://gemini.circumlunar.space/docs/cheatsheet.gmi"]}]
+```
+
+
+For more, see the tests in
+
+=> ./test/parser_test.rb
+
 ## Run webserver
 
-We run Sinatra with Puma or standalone
+We run Sinatra with Puma or standalone from a Guix environment
 
 => .guix-deploy Puma/sinatra setup
 
