@@ -38,9 +38,8 @@ module Gemini
     #  :content=>["# Heading", "", "## Sub-heading", "", "### Sub-subheading"]},
     # ... ]
     #
-    # Note that I am taking some liberties here. Most importantly:
-    # blank lines are counted as one and ignored by default. Also, in
-    # general, the regexes assume the input is correct.
+    # Note that I am taking some liberties here. Most importantly the
+    # regexes assume the input is correct.
     #
     # Futher transformations should happen in other methods
     def parse_blocks(buf, include_blank_lines = false)
@@ -95,8 +94,8 @@ module Gemini
             h[:content].push l # add content and move on
             next
           end
-        elsif type == :uri and newtype == :uri
-          # do not put URIs in one content block
+        elsif (type == :uri and newtype == :uri) or (type == :header and newtype == :header)
+          # do not put URIs and headers in one content block
           in_block = nil
           list.push(h)
           type = nil # make sure we load the next URI

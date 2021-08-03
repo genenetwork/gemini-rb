@@ -50,6 +50,16 @@ class ParserTest < MiniTest::Test
     assert_equal({:type=>:uri, :content=>["=> gemini://gemini.circumlunar.space/docs/cheatsheet.gmi Cheat sheet (2)"]}, gmi.last)
   end
 
+  def test_parse_blocks01_blanks
+    # Simple block parser with no content transformations
+    gmi = parse_blocks(File.read("data/test03.gmi", encoding: "UTF-8"),true)
+    # pp gmi
+    assert_equal(6,gmi.size)
+    assert_equal({:type=>:header, :content=>["# Heading"]}, gmi[0])
+    assert_equal({:type=>:header, :content=>["### Sub sub heading"]}, gmi[2])
+    assert_equal({type: :blank, content: ["","",""]}, gmi[4])
+  end
+
   def test_stripped_markers02
     # First transform sets header levels, splits URI text, and cleans up markers in content
     gmi = parse_markers(File.read("data/test01.gmi", encoding: "UTF-8"))
