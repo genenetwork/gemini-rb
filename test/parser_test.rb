@@ -1,3 +1,7 @@
+# Run as:
+#
+#   cd test && ruby parser_test.rb
+#
 
 require_relative '../lib/gemini-rb/parser'
 require_relative '../lib/gemini-rb/helpers'

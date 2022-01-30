@@ -40,4 +40,4 @@ Lines which start with ``` will cause clients to toggle in and out of ordinary r
 
 Proxied content from
 
-=> gemini://gemini.circumlunar.space/docs/cheatsheet.gmi
+=> gemini://gemini.circumlunar.space/docs/cheatsheet.gmi Gemini cheatsheet

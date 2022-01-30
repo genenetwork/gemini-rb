@@ -2,7 +2,7 @@
 
 Ruby parser and HTML viewer for the Gemini gemtext format.
 
-The parser simply converts gemtext into blocks and can be used standalone for generating output. Current functionality:
+The parser can be used standalone and simply converts gemtext into blocks and can be used for generating output. Current functionality:
 
 * Parse Gemini gemtext files into a Ruby block structure (as a library and Ruby gem)
 * Run a Sinatra web server serving pages from different sources (currently local file system and github http)
@@ -45,7 +45,6 @@ will parse into
   :content=>["=> gemini://gemini.circumlunar.space/docs/cheatsheet.gmi"]}]
 ```
 
-
 For more, see the tests in
 
 => ./test/parser_test.rb
@@ -85,4 +84,4 @@ Code is under the liberal BSD license.
 
 ## Copyright
 
-Pjotr Prins (C) 2021
+Pjotr Prins (C) 2021-2022

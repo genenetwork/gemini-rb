@@ -19,19 +19,32 @@ HEADER
         when :header
           level = gemini[:level]
           content = gemini[:content]
-          "<H#{level}>#{content}</H#{level}>\n"
+          "<H#{level}>#{content.join(" ")}</H#{level}>\n"
         when :text
           "<p>#{gemini[:content].join("\n")}</p>"
         when :list
-          "* #{gemini[:content]}<br />"
+          "<ul>"+
+          gemini[:content].map { |item|
+            "<li> #{item}</li>"
+          }.join("\n")+"\n</ul>\n"
         when :verbatim
           "<pre>#{gemini[:content].join("\n")}</pre>"
         when :quote
-          "#{gemini[:content]}<br />\n"
+          "<blockquote>"+
+          "#{gemini[:content].join("<br />\n")}</blockquote>\n"
         when :uri
-          text = gemini[:text]
-          text = gemini[:link] if not text
-          "<a href=\"#{gemini[:link]}\">#{text}</a>"
+          text =
+            if gemini[:text]
+              gemini[:text]
+            else
+              gemini[:link]
+            end
+          url = gemini[:link]
+          proxy = "https://portal.mozz.us/gemini/"
+          if url =~ /^gemini:\/\//
+            url = url.sub(/^gemini:\/\//,proxy)
+          end
+          "<a href=\"#{url}\">#{text}</a>"
         else
           gemini.to_s
         end

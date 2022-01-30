@@ -2,12 +2,12 @@
 # and returns a list of items with keywords. The basics are:
 #
 # [
-#  { type: :header, level: 1, content: "Gemtext cheatsheet" },
+#  { type: :header, level: 1, content: ["Gemtext cheatsheet"] },
 #  { type: :text, content: [ "Here's the basics of how text works in Gemtext:"] },
-#  { type: :list, content: "item" },
-#  { type: :quote, content: "item" },
+#  { type: :list, content: ["item"] },
+#  { type: :quote, content: ["item"] },
 #  { type: :verbatim, content: [ "line1", "line2"] },
-#  { type: :uri, link: "gemini://xxx.yyy", content: "This is a link" }
+#  { type: :uri, link: "gemini://xxx.yyy", content: ["This is a link"] }
 # ]
 #
 # New lines are embedded in :text and :verbatim as "". Between types they are assumed.
