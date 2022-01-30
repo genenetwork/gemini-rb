@@ -12,7 +12,7 @@ module Gemini
 <html>
   <body>
 HEADER
-      gmi = Gemini::Parser.parse_markers(File.read("../test/data/test01.gmi",encoding: "UTF-8"))
+      gmi = Gemini::Parser.parse_markers(File.read(filen,encoding: "UTF-8"))
       buf = gmi.map { |gemini|
         type = gemini[:type]
         case type
@@ -44,7 +44,7 @@ HEADER
           if url =~ /^gemini:\/\//
             url = url.sub(/^gemini:\/\//,proxy)
           end
-          "<a href=\"#{url}\">#{text}</a>"
+          "=> <a href=\"#{url}\">#{text}</a><br />"
         else
           gemini.to_s
         end

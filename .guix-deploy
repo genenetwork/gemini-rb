@@ -19,6 +19,7 @@ echo "  with rerun (so you don't have to reload)"
 echo "rerun -d .. 'ruby app.rb'"
 
 rm Gemfile.lock
-guix environment -C guix --ad-hoc ruby@2.6.5 nss-certs openssl --network ruby-sinatra ruby-puma less vim ruby-rerun which
+guix environment -C guix --ad-hoc ruby@2.6.5 nss-certs openssl --network ruby-sinatra ruby-puma less vim ruby-rerun which --expose=/home/wrk/services/gn-gemtext-threads=/gemtext
+
 
 # Start puma (see README)
