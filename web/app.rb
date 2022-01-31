@@ -3,10 +3,15 @@ $: << "../lib"
 require 'sinatra'
 require 'gemini-rb/htmlize'
 
-set :root, "/home/wrk/services/gemini"
+ROOT = "/home/wrk/services/gemini"
+set :root, "/home/wrk/services/gemini" # hard coded for now
 
 module Gemini
   module HTML
+
+    def self.root()
+      ROOT
+    end
 
     def self.make_page(page)
       htmlize(page)

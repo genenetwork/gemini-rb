@@ -1,3 +1,4 @@
+require 'sinatra'
 require 'gemini-rb/parser'
 require 'gemini-rb/helpers'
 
@@ -7,13 +8,34 @@ module Gemini
 
     extend self
 
+    def read_file_if_exists(path,fn)
+      fn2 = path+"/"+fn
+      if File.exist?(fn2)
+        File.read(fn2, encoding: "UTF-8")
+      else
+        ""
+      end
+    end
+
     def htmlize filen
+      skin   = "genenetwork"
+      path   = root + "/" + skin
+      head   = read_file_if_exists(path,"header.html")
+      banner   = read_file_if_exists(path,"banner.html")
+      footer   = read_file_if_exists(path,"footer.html")
       buf = <<HEADER
 <html>
+  <head>
+    #{head}
+  </head>
   <body>
+    <div class="banner">
+    #{banner}
+    </div> <!-- banner -->
+    <div class="content">
 HEADER
       gmi = Gemini::Parser.parse_markers(File.read(filen,encoding: "UTF-8"))
-      buf = gmi.map { |gemini|
+      buf += gmi.map { |gemini|
         type = gemini[:type]
         case type
         when :header
@@ -21,17 +43,34 @@ HEADER
           content = gemini[:content]
           "<H#{level}>#{content.join(" ")}</H#{level}>\n"
         when :text
-          "<p>#{gemini[:content].join("\n")}</p>"
+          %{
+<div class="text">
+  <p>
+  #{gemini[:content].join("\n")}
+  </p>
+</div>
+}
         when :list
-          "<ul>"+
+          "<div class=\"list\"><ul>"+
           gemini[:content].map { |item|
             "<li> #{item}</li>"
-          }.join("\n")+"\n</ul>\n"
+          }.join("\n")+"\n</ul></div>\n"
         when :verbatim
-          "<pre>#{gemini[:content].join("\n")}</pre>"
+          %{
+<div class="verbatim">
+<pre>
+#{gemini[:content].join("\n")}
+</pre>
+</div>
+}
         when :quote
-          "<blockquote>"+
-          "#{gemini[:content].join("<br />\n")}</blockquote>\n"
+          %{
+<div class="quote">
+<blockquote>
+#{gemini[:content].join("<br />\n")}
+</blockquote>
+</div>
+}
         when :uri
           text =
             if gemini[:text]
@@ -51,6 +90,9 @@ HEADER
 
       }.join("\n")
       buf += <<FOOTER
+
+    </div> <!-- content -->
+  #{footer}
   </body>
 </html>
 FOOTER
