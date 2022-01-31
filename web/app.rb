@@ -5,6 +5,7 @@ require 'gemini-rb/htmlize'
 
 ROOT = "/home/wrk/services/gemini"
 set :root, "/home/wrk/services/gemini" # hard coded for now
+GEMTEXT = ROOT+"/gn-gemtext-threads"
 
 module Gemini
   module HTML
@@ -29,6 +30,11 @@ end
 
 get '/test' do
   Gemini::HTML::make_page("../test/data/test01.gmi")
+end
+
+get '/skin/*' do
+  PATH=ROOT+"/gn-gemtext-threads"+request.path_info
+  send_file(PATH)
 end
 
 get '/gemini/*' do

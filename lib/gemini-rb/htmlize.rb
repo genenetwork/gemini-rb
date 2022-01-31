@@ -13,12 +13,12 @@ module Gemini
       if File.exist?(fn2)
         File.read(fn2, encoding: "UTF-8")
       else
-        ""
+        "<!-- Can not read #{fn2} -->"
       end
     end
 
     def htmlize filen
-      skin   = "genenetwork"
+      skin   = "gn-gemtext-threads/skin/genenetwork" # hard coded
       path   = root + "/" + skin
       head   = read_file_if_exists(path,"header.html")
       banner   = read_file_if_exists(path,"banner.html")
