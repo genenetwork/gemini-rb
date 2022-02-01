@@ -17,8 +17,8 @@ module Gemini
       end
     end
 
-    def htmlize filen
-      skin   = "gn-gemtext-threads/skin/genenetwork" # hard coded
+    def htmlize filen, skin=nil
+      skin   = "gn-gemtext-threads/skin/#{skin}" # hard coded
       path   = root + "/" + skin
       head   = read_file_if_exists(path,"header.html")
       banner   = read_file_if_exists(path,"banner.html")

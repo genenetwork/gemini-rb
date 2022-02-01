@@ -14,8 +14,8 @@ module Gemini
       ROOT
     end
 
-    def self.make_page(page)
-      htmlize(page)
+    def self.make_page(page,skin=nil)
+      htmlize(page,skin)
     end
   end
 end
@@ -37,7 +37,8 @@ get '/skin/*' do
   send_file(PATH)
 end
 
-get '/gemini/*' do
-  PATH=request.path_info.sub(/^\/gemini\//,"")
-  Gemini::HTML::make_page(settings.root+"/"+PATH)
+get '/gemini/:skin/*' do
+  skin = params[:skin]
+  PATH=request.path_info.sub(/^\/gemini\/#{skin}\//,"")
+  Gemini::HTML::make_page(settings.root+"/"+PATH, skin)
 end

@@ -51,6 +51,8 @@ For more, see the tests in
 
 ## Run webserver
 
+This webserver is not a real proxy for gemini. What it does is parse gemtext files and serves them as HTML. Multiple skins are supported (in the spirit of gemini the reader chooses how information is presented).
+
 We run Sinatra with Puma or standalone from a Guix environment
 
 => .guix-deploy Puma/sinatra setup
@@ -75,6 +77,19 @@ puma -t 1 -e development
 ```
 
 For production simply run puma.
+
+## Paths
+
+We host several sites as git repositories in a gemini directory. This gets accessed by both a gemini server and a web server to present output. One interesting aspect is that layout or 'skin' is part of the URL:
+
+=> http://host/:skin/path
+
+I.e., the first element of the path defines the skin - which ascertains that further navigation retains the skin in a 'monadic' way because all paths are relative.
+
+Examples:
+
+=> one FIXME
+=> two FiXME
 
 ## License
 
