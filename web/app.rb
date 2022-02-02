@@ -4,10 +4,9 @@ require 'sinatra'
 require 'gemini-rb/htmlize'
 require 'yaml'
 
-ROOT = "/home/wrk/services/gemini"
-set :root, "/home/wrk/services/gemini" # hard coded for now
-GEMTEXT = ROOT+"/gn-gemtext-threads"
-YAMLFN = GEMTEXT+"/settings.yaml"
+ROOT = "/home/wrk/services/gemini/gn-gemtext-threads" # pick up from ENV
+set :root, ROOT # hard coded for now
+YAMLFN = ROOT+"/settings.yaml"
 GT_SETTINGS =
   if File.exist?(YAMLFN)
     YAML.load(File.read(YAMLFN))
@@ -22,8 +21,8 @@ module Gemini
       ROOT
     end
 
-    def self.make_page(page,repo=nil,skin=nil,edit=nil)
-      htmlize(page,repo,skin,edit)
+    def self.make_page(page,skin=nil,edit=nil)
+      htmlize(page,skin,edit)
     end
   end
 end
@@ -45,7 +44,7 @@ get '/test' do
 end
 
 get '/skin/*' do
-  PATH=ROOT+"/gn-gemtext-threads"+request.path_info
+  PATH=ROOT+request.path_info
   send_file(PATH)
 end
 
@@ -53,5 +52,5 @@ get '/gemini/:skin/:repo/*' do
   skin = params[:skin]
   repo = params[:repo]
   relpath=request.path_info.sub(/^\/gemini\/#{skin}\/#{repo}\//,"")
-  Gemini::HTML::make_page(relpath, repo, skin, GT_SETTINGS["git-edit-prefix"])
+  Gemini::HTML::make_page(relpath, skin, GT_SETTINGS["git-edit-prefix"])
 end

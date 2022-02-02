@@ -17,10 +17,9 @@ module Gemini
       end
     end
 
-    def htmlize filen, repo, skin=nil, edit_prefix=nil
-      skin2   = "#{repo}/skin/#{skin}" # hard coded
-      path   = root + "/" + repo + "/" + filen
-      spath   = root + "/" + skin2
+    def htmlize filen, skin=nil, edit_prefix=nil
+      path   = root + "/" + filen
+      spath   = root + "/skin/" + skin
       head   = read_file_if_exists(spath,"header.html")
       banner   = read_file_if_exists(spath,"banner.html")
       footer   = read_file_if_exists(spath,"footer.html")
