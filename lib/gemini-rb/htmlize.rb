@@ -17,23 +17,16 @@ module Gemini
       end
     end
 
-    def htmlize filen, skin=nil, edit_prefix=nil
+    def htmlize filen, repo, skin=nil, edit_prefix=nil
       skin2   = "#{repo}/skin/#{skin}" # hard coded
       path   = root + "/" + repo + "/" + filen
       spath   = root + "/" + skin2
       head   = read_file_if_exists(spath,"header.html")
       banner   = read_file_if_exists(spath,"banner.html")
       footer   = read_file_if_exists(spath,"footer.html")
-      buf = <<HEADER
-<html>
-  <head>
-    #{head}
-  </head>
-  <body>
-    <div class="banner">
-    #{banner}
-    </div> <!-- banner -->
-    <div class="content">
+      edit_button =
+        if edit_prefix
+          <<BUTTON
       <div class="edit">
         <div class="github-btn-container">
           <div class="github-btn">
@@ -44,6 +37,23 @@ module Gemini
           </div>
         </div>
       </div>
+BUTTON
+        else
+          ""
+        end
+
+      buf = <<HEADER
+<html>
+  <head>
+    #{head}
+  </head>
+  <body>
+    <div class="banner">
+    #{banner}
+    </div> <!-- banner -->
+    <div class="content">
+      #{edit_button}
+
 HEADER
       gmi = Gemini::Parser.parse_markers(File.read(path,encoding: "UTF-8"))
       buf += gmi.map { |gemini|
@@ -105,11 +115,7 @@ HEADER
 
       }.join("\n")
       buf += <<FOOTER
-      <div class="edit">
-            <a href="#{edit_prefix}/#{filen}">
-            edit page
-            </a>
-      </div>
+      #{edit_button}
     </div> <!-- content -->
   #{footer}
   </body>
