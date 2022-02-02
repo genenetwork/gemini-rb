@@ -38,6 +38,23 @@ A multiline quote:
 
 Lines which start with ``` will cause clients to toggle in and out of ordinary rendering mode and preformatted mode. In preformatted mode, Gemtext syntax is ignored so links etc. will not be rendered, and text will appear in a monospace font.
 
-Proxied content from
+So far, this is proxied content from
 
 => gemini://gemini.circumlunar.space/docs/cheatsheet.gmi Gemini cheatsheet
+
+## Extensions
+
+The proxy can show embedded images
+
+=> 154px-Tux-simple.svg.png Tux caption
+%html{width=30%}
+
+and do syntax highlighting
+
+```ruby
+test = lambda { |size|
+  print size
+  }
+
+test.call 500
+```

@@ -18,13 +18,14 @@ class ParserTest < MiniTest::Test
     # Simple block parser with no content transformations
     gmi = parse_blocks(File.read("data/test01.gmi", encoding: "UTF-8"))
     pp gmi
-    assert_equal(15,gmi.size)
+    assert_equal(21,gmi.size)
     assert_equal({type: :header, content: ["# Gemtext cheatsheet"]}, gmi[0])
     assert_equal({:type=>:text, :content=>["Here's the basics of how text works in Gemtext:"]}, gmi[1])
     assert_equal({:type=>:list, :content=>["* Long lines get wrapped by the client to fit the screen", "* Short lines *don't* get joined together", "* Write paragraphs as single long lines", "* Blank lines are rendered verbatim"]}, gmi[2])
 
     assert_equal({:type=>:verbatim, :content=>["* Mercury", "* Gemini", "* Apollo"]}, gmi[7])
-    assert_equal({:type=>:uri, :content=>["=> gemini://gemini.circumlunar.space/docs/cheatsheet.gmi"]}, gmi.last)
+    assert_equal({:type=>:uri, :content=>["=> gemini://gemini.circumlunar.space/docs/cheatsheet.gmi Gemini cheatsheet"]}, gmi[14])
+    assert_equal({:type=>:verbatim, :content=>["test = lambda { |size|", "  print size", "  }", "", "test.call 500"]}, gmi[-1])
   end
 
   def test_parse_blocks01_blanks
@@ -68,15 +69,15 @@ class ParserTest < MiniTest::Test
     # First transform sets header levels, splits URI text, and cleans up markers in content
     gmi = parse_markers(File.read("data/test01.gmi", encoding: "UTF-8"))
     # pp gmi
-    assert_equal(15,gmi.size)
+    assert_equal(21,gmi.size)
     assert_equal({type: :header, level: 1, content: ["Gemtext cheatsheet"]}, gmi[0])
     assert_equal({type: :header, level: 2, content: ["Headings"]}, gmi[3])
     assert_equal({type: :text, content: ["Here's the basics of how text works in Gemtext:"]}, gmi[1])
     assert_equal( {:type=>:list, :content=>["Long lines get wrapped by the client to fit the screen", "Short lines *don't* get joined together", "Write paragraphs as single long lines", "Blank lines are rendered verbatim"]}, gmi[2])
     assert_equal({type: :verbatim, content: ["* Mercury", "* Gemini", "* Apollo"]}, gmi[7])
-    assert_equal({:type=>:quote, :content=>["Line 1", "Line 2"]}, gmi[-4])
-    assert_equal({:type=>:text, :content=>["Proxied content from"]}, gmi[-2])
-    assert_equal({type: :uri, link: "gemini://gemini.circumlunar.space/docs/cheatsheet.gmi", text: nil}, gmi.last)
+    assert_equal({:type=>:quote, :content=>["Line 1", "Line 2"]}, gmi[11])
+    assert_equal({:type=>:text, :content=>["So far, this is proxied content from"]}, gmi[13])
+    assert_equal({type: :uri, link: "gemini://gemini.circumlunar.space/docs/cheatsheet.gmi", text: "Gemini cheatsheet"}, gmi[14])
   end
 
   def test_stripped_markers03

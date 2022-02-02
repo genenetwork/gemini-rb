@@ -17,12 +17,13 @@ module Gemini
       end
     end
 
-    def htmlize filen, skin=nil
-      skin   = "gn-gemtext-threads/skin/#{skin}" # hard coded
-      path   = root + "/" + skin
-      head   = read_file_if_exists(path,"header.html")
-      banner   = read_file_if_exists(path,"banner.html")
-      footer   = read_file_if_exists(path,"footer.html")
+    def htmlize filen, skin=nil, edit_prefix=nil
+      skin2   = "#{repo}/skin/#{skin}" # hard coded
+      path   = root + "/" + repo + "/" + filen
+      spath   = root + "/" + skin2
+      head   = read_file_if_exists(spath,"header.html")
+      banner   = read_file_if_exists(spath,"banner.html")
+      footer   = read_file_if_exists(spath,"footer.html")
       buf = <<HEADER
 <html>
   <head>
@@ -33,8 +34,18 @@ module Gemini
     #{banner}
     </div> <!-- banner -->
     <div class="content">
+      <div class="edit">
+        <div class="github-btn-container">
+          <div class="github-btn">
+            <a href="#{edit_prefix}/#{filen}">
+            edit page
+              <!-- <img src="/static/images/edit.png"> -->
+            </a>
+          </div>
+        </div>
+      </div>
 HEADER
-      gmi = Gemini::Parser.parse_markers(File.read(filen,encoding: "UTF-8"))
+      gmi = Gemini::Parser.parse_markers(File.read(path,encoding: "UTF-8"))
       buf += gmi.map { |gemini|
         type = gemini[:type]
         case type
@@ -79,18 +90,26 @@ HEADER
               gemini[:link]
             end
           url = gemini[:link]
-          proxy = "https://portal.mozz.us/gemini/"
-          if url =~ /^gemini:\/\//
-            url = url.sub(/^gemini:\/\//,proxy)
+          if File.exist?(url)
+            %{<img src="#{url}" />}
+          else
+            proxy = "https://portal.mozz.us/gemini/"
+            if url =~ /^gemini:\/\//
+              url = url.sub(/^gemini:\/\//,proxy)
+            end
+            "=> <a href=\"#{url}\">#{text}</a><br />"
           end
-          "=> <a href=\"#{url}\">#{text}</a><br />"
         else
           gemini.to_s
         end
 
       }.join("\n")
       buf += <<FOOTER
-
+      <div class="edit">
+            <a href="#{edit_prefix}/#{filen}">
+            edit page
+            </a>
+      </div>
     </div> <!-- content -->
   #{footer}
   </body>

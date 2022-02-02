@@ -88,8 +88,30 @@ I.e., the first element of the path defines the skin - which ascertains that fur
 
 Examples:
 
-=> one FIXME
-=> two FiXME
+=> http://gemini.thebird.nl/gemini/genenetwork/gn-gemtext-threads/README.gmi
+=> http://gemini.thebird.nl/gemini/default/gn-gemtext-threads/README.gmi
+
+render different skins of the same content.
+
+## Extensions
+
+The proxy can render different layouts using skins - as shown above. Two additional functionalities are embedded in the proxy:
+
+* Inline images
+* Syntax highlighting
+
+For inline images the proxy simply checks if an image file exists and generates the relevant HTML inlining. To provide layout directions they can be added to the line. E.g. with
+
+%html{width=80%}
+=> image.png This is the caption
+
+Syntax highlighting is triggered with markdown style
+
+```ruby
+print "Example with Ruby syntax"
+```
+
+The syntax highlighting can be adjusted using an accompanying CSS from the `highlight` tool.
 
 ## License
 
