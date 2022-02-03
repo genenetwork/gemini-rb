@@ -17,19 +17,25 @@ module Gemini
       end
     end
 
-    def htmlize filen, skin=nil, edit_prefix=nil
-      path   = root + "/" + filen
-      spath   = root + "/skin/" + skin
+    def htmlize site, filen, skin="", edit_prefix=nil
+      path =
+        if File.exist?(filen)
+          filen
+        else
+          path   = root + "/" + filen
+        end
+      spath   = root + "/" + site + "/skin/" + skin
       head   = read_file_if_exists(spath,"header.html")
       banner   = read_file_if_exists(spath,"banner.html")
       footer   = read_file_if_exists(spath,"footer.html")
       edit_button =
         if edit_prefix
+          efn = edit_prefix+"/"+filen.sub(/#{site}\//,"")
           <<BUTTON
       <div class="edit">
         <div class="github-btn-container">
           <div class="github-btn">
-            <a href="#{edit_prefix}/#{filen}">
+            <a href="#{efn}">
             edit page
               <!-- <img src="/static/images/edit.png"> -->
             </a>
@@ -54,6 +60,9 @@ BUTTON
       #{edit_button}
 
 HEADER
+      if !File.exist?(path)
+        return "ERROR: file #{filen} does not exist on this server"
+      end
       gmi = Gemini::Parser.parse_markers(File.read(path,encoding: "UTF-8"))
       buf += gmi.map { |gemini|
         type = gemini[:type]
@@ -99,14 +108,16 @@ HEADER
               gemini[:link]
             end
           url = gemini[:link]
-          if File.exist?(url)
+          if url =~ /\.(png|jpg|jpeg)$/i
             %{<img src="#{url}" />}
           else
+            # fill out proxy if it is a gemini link
             proxy = "https://portal.mozz.us/gemini/"
             if url =~ /^gemini:\/\//
               url = url.sub(/^gemini:\/\//,proxy)
             end
             "=> <a href=\"#{url}\">#{text}</a><br />"
+            # url
           end
         else
           gemini.to_s
@@ -120,6 +131,20 @@ HEADER
   </body>
 </html>
 FOOTER
+      gemini = gt_settings(site)["gemini"]
+      if gemini
+        buf += <<GEMINI
+        <div class="footer">
+          <div class="gemini">
+            Read with a
+            <a href="https://en.wikipedia.org/wiki/Gemini_(protocol)">
+             gemini
+            </a> reader:
+            #{gemini + "/" + filen}
+          </div>
+        </div>
+GEMINI
+      end
       buf
     end
   end

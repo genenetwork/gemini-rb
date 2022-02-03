@@ -46,7 +46,7 @@ So far, this is proxied content from
 
 The proxy can show embedded images
 
-=> 154px-Tux-simple.svg.png Tux caption
+=> /test/data/154px-Tux-simple.svg.png Tux caption
 %html{width=30%}
 
 and do syntax highlighting
