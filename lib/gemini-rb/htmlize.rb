@@ -61,7 +61,7 @@ BUTTON
 
 HEADER
       if !File.exist?(path)
-        return "ERROR: file #{filen} does not exist on this server"
+        return "ERROR: file #{filen} --- #{path} --- does not exist on this server"
       end
       gmi = Gemini::Parser.parse_markers(File.read(path,encoding: "UTF-8"))
       buf += gmi.map { |gemini|
@@ -116,7 +116,10 @@ HEADER
             if url =~ /^gemini:\/\//
               url = url.sub(/^gemini:\/\//,proxy)
             end
-            "=> <a href=\"#{url}\">#{text}</a><br />"
+            %{<div class="uri">
+               <a href="#{url}">#{text}</a>
+              </div>
+            }
             # url
           end
         else
