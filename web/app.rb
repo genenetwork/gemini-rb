@@ -3,6 +3,7 @@ $: << "../lib"
 require 'sinatra'
 require 'gemini-rb/htmlize'
 require 'yaml'
+require 'ostruct'
 
 ROOT = "/home/wrk/services/gemini" # pick up from ENV
 set :root, ROOT # hard coded for now
@@ -23,8 +24,8 @@ module Gemini
       end
     end
 
-    def self.make_page(site,page,skin="",edit=nil)
-      htmlize(site,page,skin,edit)
+    def self.make_page(o,edit=nil)
+      htmlize(o,edit)
     end
   end
 end
@@ -46,9 +47,28 @@ get '/test/*.png' do
   send_file(path)
 end
 
+# http://localhost:4567/test/data/test01.gmi
 get '/test/*' do
-  path = ".."+request.path_info
-  Gemini::HTML::make_page("",path)
+  o = OpenStruct.new(params)
+  o.site = ""
+  o.skin = ""
+  o.relpath = ".."+request.path_info
+  o.fullpath = o.relpath
+  Gemini::HTML::make_page(o)
+end
+
+# To confuse things a little we allow resolving:
+#
+#   HOST/site/skin/path
+#   HOST/skin/site/path
+#
+# It won't work if skin equals a site!
+
+def site_skin_paths(params)
+  o = OpenStruct.new(params)
+  o.relpath=request.path_info.sub(/^\/gemini\/#{o.site}\/#{o.skin}\//,"")
+  o.fullpath = ROOT+"/"+o.site+"/"+o.relpath
+  o
 end
 
 get '/skin/:site/:skin/*' do
@@ -59,16 +79,31 @@ get '/skin/:site/:skin/*' do
   send_file(path)
 end
 
-get '/gemini/:skin/:site/static/*' do
-  skin = params[:skin]
+# Temporary redirect
+get '/gemini/blog/pubseq/*' do
   site = params[:site]
-  relpath=request.path_info.sub(/^\/gemini\/#{skin}\//,"")
-  send_file(ROOT+"/"+relpath)
+  skin = params[:skin]
+  relpath=request.path_info.sub(/^\/gemini\/blog\/pubseq\//,"")
+  redirect "/gemini/pubseq/blog/"+relpath
 end
 
-get '/gemini/:skin/:site/*' do
-  skin = params[:skin]
+# Temporary redirect
+get '/gemini/genenetwork/gn-gemtext-threads/*' do
   site = params[:site]
-  relpath=request.path_info.sub(/^\/gemini\/#{skin}\//,"")
-  Gemini::HTML::make_page(site,relpath, skin, Gemini::HTML::gt_settings(site)["git-edit-prefix"])
+  skin = params[:skin]
+  relpath=request.path_info.sub(/^\/gemini\/genenetwork\/gn-gemtext-threads\//,"")
+  redirect "/gemini/gn-gemtext-threads/genenetwork/"+relpath
+end
+
+get '/gemini/:site/:skin/static/*' do
+  site = params[:site]
+  skin = params[:skin]
+  relpath = request.path_info.sub(/^\/gemini\/#{site}\/#{skin}\//,"")
+  fullpath=ROOT+"/"+site+"/"+relpath
+  send_file(fullpath)
+end
+
+get '/gemini/:site/:skin/*' do
+  o = site_skin_paths(params)
+  Gemini::HTML::make_page(o,Gemini::HTML::gt_settings(o.site)["git-edit-prefix"])
 end

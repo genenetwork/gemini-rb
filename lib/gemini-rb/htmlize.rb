@@ -17,12 +17,15 @@ module Gemini
       end
     end
 
-    def htmlize site, filen, skin="", edit_prefix=nil
+    def htmlize o, edit_prefix=nil
+      site = o.site
+      skin = o.skin
+      filen = o.relpath
       path =
         if File.exist?(filen)
           filen
         else
-          path   = root + "/" + filen
+          o.fullpath
         end
       spath   = root + "/" + site + "/skin/" + skin
       head   = read_file_if_exists(spath,"header.html")
@@ -37,7 +40,7 @@ module Gemini
           <div class="github-btn">
             <a href="#{efn}">
             edit page
-              <!-- <img src="/static/images/edit.png"> -->
+              <!-- <img src="/gemini/#{site}/static/images/edit.png"> -->
             </a>
           </div>
         </div>
