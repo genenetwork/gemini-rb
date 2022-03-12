@@ -57,12 +57,9 @@ get '/test/*' do
   Gemini::HTML::make_page(o)
 end
 
-# To confuse things a little we allow resolving:
+# We resolve
 #
 #   HOST/site/skin/path
-#   HOST/skin/site/path
-#
-# It won't work if skin equals a site!
 
 def site_skin_paths(params)
   o = OpenStruct.new(params)
@@ -79,7 +76,7 @@ get '/skin/:site/:skin/*' do
   send_file(path)
 end
 
-# Temporary redirect
+# Temporary redirect (because we used the reversed skin/site initially)
 get '/gemini/blog/pubseq/*' do
   site = params[:site]
   skin = params[:skin]
@@ -87,7 +84,7 @@ get '/gemini/blog/pubseq/*' do
   redirect "/gemini/pubseq/blog/"+relpath
 end
 
-# Temporary redirect
+# Temporary redirect (because we used the reversed skin/site initially)
 get '/gemini/genenetwork/gn-gemtext-threads/*' do
   site = params[:site]
   skin = params[:skin]
